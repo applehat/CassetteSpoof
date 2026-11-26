@@ -39,11 +39,6 @@ Encoding is concatenated GS1 (`01008500174214311727061021260610970000295` for th
 python3 -m http.server -d . 8080
 ```
 
-## Related
-
-- [applehat/reversing-twiist](https://github.com/applehat/reversing-twiist) — protocol RE notes (cassette UDI fields documented there)
-- [applehat/TwiistOff](https://github.com/applehat/TwiistOff) — bonded Android debug client
-
 ## License
 
 MIT — use at your own risk; research / educational context only.
