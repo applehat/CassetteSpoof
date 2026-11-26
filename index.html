@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light" />
   <title>CassetteSpoof</title>
   <meta name="description" content="Research-only GS1 DataMatrix generator matching Twiist disposable cassette UDI labels." />
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
   <script src="https://unpkg.com/bwip-js@4.5.1/dist/bwip-js-min.js"></script>
 </head>
 <body>
@@ -129,9 +129,16 @@
     </section>
 
     <p id="status" class="status" aria-live="polite"></p>
+
+    <section class="insight" aria-label="What we think happens">
+      <h2>What we think happens</h2>
+      <p>When the official app scans a cassette code, it saves that code &mdash; GTIN, expiry, and serial &mdash; on the phone, and from everything we&rsquo;ve seen in the app&rsquo;s own data it syncs that record up to Sequel&rsquo;s cloud like every other event. The &ldquo;Cassette Already Used&rdquo; check itself looks local (the app remembers serials it has seen on that phone), but the record almost certainly leaves the device.</p>
+      <p>So if you scan a generated code while the phone is online, assume Sequel ends up with a record of that serial tied to your account. Generated serials are random, so they shouldn&rsquo;t collide with anyone else&rsquo;s real cassette. If that matters to you, scan with the phone offline &mdash; or just accept the record exists. This is bench tooling for water-fill reuse, not therapy and not on a person.</p>
+    </section>
   </main>
 
   <footer>
+    <p class="tracking-note">Heads up: using this tool is most likely trackable by Sequel. The official app appears to upload every cassette code it scans, so a generated code scanned while the phone is online will probably land in their records tied to your account. If you use it, you&rsquo;re choosing to do that knowingly &mdash; and the author isn&rsquo;t liable for what Sequel or anyone else does with that information.</p>
     <p class="disclaimer">CassetteSpoof is a small hobby project for generating GS1 DataMatrix labels. It isn't affiliated with Sequel, it isn't FDA approved, and putting a regenerated code on a cassette you've already used is off-label and unsupported by the manufacturer. Insulin delivery is life-critical, so please make your own informed decision and talk with your care team. We believe individual patient choice matters, but you alone are responsible for how you use this tool, and the author is not liable for any harm, loss, or damage that comes from using it.</p>
     <p class="repo"><a href="https://github.com/applehat/CassetteSpoof">github.com/applehat/CassetteSpoof</a></p>
   </footer>

@@ -318,6 +318,31 @@ footer {
 
 footer a { color: var(--accent-dark); }
 
+.insight {
+  max-width: 40rem;
+  margin: 1.4rem auto 0;
+  padding: 0.9rem 1.1rem;
+  text-align: left;
+  background: #f7f8fa;
+  border: 1px solid #e6ebf0;
+  border-radius: 0.6rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #334155;
+}
+.insight h2 { margin: 0 0 0.5rem; font-size: 0.95rem; }
+.insight p { margin: 0 0 0.6rem; }
+.insight p:last-child { margin-bottom: 0; }
+
+.tracking-note {
+  margin: 0 auto 0.6rem;
+  max-width: 40rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 /* Phones: zoom into the cassette face so a 280px+ matrix fits on screen. */
 @media (max-width: 720px) {
   body { padding: 0.75rem 0 1.25rem; overflow-x: hidden; }
