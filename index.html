@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <title>CassetteSpoof — GS1 DataMatrix for Twiist RE</title>
+  <meta name="description" content="Research-only GS1 DataMatrix generator matching Twiist disposable cassette UDI labels." />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/bwip-js@4.5.1/dist/bwip-js-min.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">▣</span>
+      <div>
+        <h1>CassetteSpoof</h1>
+        <p class="tagline">GS1 DataMatrix generator for Twiist cassette RE / bench testing</p>
+      </div>
+    </div>
+  </header>
+
+  <aside class="disclaimer" role="note">
+    <strong>Research only.</strong>
+    This tool is for reverse-engineering and bench testing. Reusing cassettes is
+    <em>not</em> approved or supported by Twiist / Sequel Med Tech. Not medical advice.
+    Do not use generated labels on supplies worn by a person.
+  </aside>
+
+  <main class="layout">
+    <section class="stage" aria-label="Cassette preview">
+      <div class="cassette" id="cassette">
+        <!-- Cute vector cassette / cart -->
+        <svg class="cassette-art" viewBox="0 0 360 220" role="img" aria-label="Disposable cassette illustration">
+          <defs>
+            <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#f7f9fc"/>
+              <stop offset="100%" stop-color="#e4ebf4"/>
+            </linearGradient>
+            <linearGradient id="blueEdge" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#1e3a8a"/>
+              <stop offset="100%" stop-color="#2563eb"/>
+            </linearGradient>
+            <filter id="softShadow" x="-10%" y="-10%" width="120%" height="130%">
+              <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.18"/>
+            </filter>
+          </defs>
+
+          <!-- Main body -->
+          <rect x="28" y="36" width="304" height="148" rx="22" fill="url(#bodyGrad)" stroke="#94a3b8" stroke-width="2" filter="url(#softShadow)"/>
+
+          <!-- Left twist-lock port -->
+          <circle cx="58" cy="110" r="26" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/>
+          <circle cx="58" cy="110" r="16" fill="#f8fafc" stroke="#475569" stroke-width="1.5"/>
+          <circle cx="58" cy="110" r="7" fill="#1e40af"/>
+          <path d="M58 94 v32 M42 110 h32" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+
+          <!-- Reservoir window -->
+          <rect x="96" y="58" width="72" height="104" rx="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="1.5"/>
+          <rect x="102" y="92" width="60" height="64" rx="6" fill="#93c5fd" opacity="0.55"/>
+          <text x="132" y="80" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="#1e3a8a" font-weight="600">300 U</text>
+
+          <!-- Label sticker area -->
+          <rect x="184" y="52" width="132" height="116" rx="8" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="250" y="68" text-anchor="middle" font-family="system-ui,sans-serif" font-size="8" fill="#64748b" letter-spacing="0.5">UDI · GS1 DataMatrix</text>
+
+          <!-- Blue accent stripe -->
+          <rect x="28" y="168" width="304" height="16" rx="0" fill="url(#blueEdge)" opacity="0.9"/>
+          <rect x="28" y="168" width="304" height="16" rx="8" fill="url(#blueEdge)" clip-path="inset(0 0 0 0 round 0 0 18 18)"/>
+
+          <!-- Tiny brand stub -->
+          <text x="250" y="158" text-anchor="middle" font-family="system-ui,sans-serif" font-size="7" fill="#94a3b8">DKPI-11073-001 · SAMPLE</text>
+        </svg>
+
+        <div class="dm-slot" title="Generated DataMatrix">
+          <canvas id="dmCanvas" width="200" height="200" aria-label="GS1 DataMatrix barcode"></canvas>
+        </div>
+      </div>
+
+      <div class="preview-meta">
+        <div class="field-readout">
+          <span class="label">Element string</span>
+          <code id="elementString">(01)…</code>
+        </div>
+        <div class="field-readout">
+          <span class="label">Raw digits (for encoding)</span>
+          <code id="rawDigits">…</code>
+        </div>
+        <p class="scan-hint">Hold your phone close to the symbol above — high contrast, no text inside the matrix.</p>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="UDI fields">
+      <h2>UDI fields</h2>
+
+      <label class="ctrl">
+        <span class="ctrl-label">
+          GTIN <span class="ai">(01)</span>
+          <small>Product code · default DKPI-11073-001 unit-of-use</small>
+        </span>
+        <input id="gtin" type="text" inputmode="numeric" maxlength="14" autocomplete="off" spellcheck="false" />
+      </label>
+
+      <div class="row">
+        <label class="ctrl">
+          <span class="ctrl-label">
+            Manufacture date
+            <small>Past date · becomes the (21) serial prefix (YYMMDD)</small>
+          </span>
+          <input id="mfgDate" type="date" />
+        </label>
+        <label class="ctrl">
+          <span class="ctrl-label">
+            Expiry <span class="ai">(17)</span>
+            <small>YYMMDD · default = manufacture + 1 year</small>
+          </span>
+          <input id="expiryDate" type="date" />
+        </label>
+      </div>
+
+      <p class="guidelines">
+        Official labels put the manufacture day in the <strong>(21)</strong> serial prefix and set
+        <strong>(17)</strong> about one year later. Keep manufacture in the past and expiry in the future
+        unless you are deliberately testing edge cases.
+      </p>
+
+      <label class="ctrl">
+        <span class="ctrl-label">
+          Serial <span class="ai">(21)</span>
+          <small>15 chars typical: YYMMDD + 9 digits · edit freely or regenerate</small>
+        </span>
+        <div class="serial-row">
+          <input id="serial" type="text" inputmode="numeric" maxlength="20" autocomplete="off" spellcheck="false" />
+          <button type="button" id="regenBtn" class="btn primary">Regenerate</button>
+        </div>
+      </label>
+
+      <div class="actions">
+        <button type="button" id="syncExpiryBtn" class="btn">Expiry = mfg + 1y</button>
+        <button type="button" id="resetBtn" class="btn ghost">Reset to defaults</button>
+      </div>
+
+      <p id="status" class="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      CassetteSpoof · open source for RE ·
+      <a href="https://github.com/applehat/CassetteSpoof">github.com/applehat/CassetteSpoof</a>
+    </p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
