@@ -4,99 +4,112 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="color-scheme" content="light" />
-  <title>CassetteSpoof — GS1 DataMatrix for Twiist RE</title>
+  <title>CassetteSpoof</title>
   <meta name="description" content="Research-only GS1 DataMatrix generator matching Twiist disposable cassette UDI labels." />
   <link rel="stylesheet" href="style.css" />
   <script src="https://unpkg.com/bwip-js@4.5.1/dist/bwip-js-min.js"></script>
 </head>
 <body>
-  <header class="top">
-    <div class="brand">
-      <span class="logo" aria-hidden="true">▣</span>
-      <div>
-        <h1>CassetteSpoof</h1>
-        <p class="tagline">GS1 DataMatrix generator for Twiist cassette RE / bench testing</p>
+  <main>
+    <h1>CassetteSpoof</h1>
+
+    <div class="stage" aria-label="Cassette preview">
+      <div class="cassette" id="cassette">
+        <div class="disc">
+          <div class="disc-shell" aria-hidden="true">
+            <svg class="disc-art" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="faceGrad" cx="42%" cy="36%" r="68%">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="55%" stop-color="#f7f8fa"/>
+                  <stop offset="100%" stop-color="#e6ebf0"/>
+                </radialGradient>
+                <linearGradient id="rimGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#f3f5f7"/>
+                  <stop offset="45%" stop-color="#d9dee4"/>
+                  <stop offset="100%" stop-color="#c5ccd3"/>
+                </linearGradient>
+                <linearGradient id="tealGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#2ec4c0"/>
+                  <stop offset="100%" stop-color="#0e8f8c"/>
+                </linearGradient>
+              </defs>
+              <!-- thickness offset -->
+              <circle cx="102.4" cy="103.6" r="96" fill="#c3c9d0"/>
+              <!-- outer rim -->
+              <circle cx="100" cy="100" r="96" fill="url(#rimGrad)"/>
+              <!-- face -->
+              <circle cx="100" cy="100" r="82" fill="url(#faceGrad)" stroke="#d0d5db" stroke-width="0.6"/>
+              <!-- inner ring -->
+              <circle cx="100" cy="100" r="78.5" fill="none" stroke="#c5ccd3" stroke-width="1.3"/>
+              <circle cx="100" cy="100" r="76.8" fill="none" stroke="#eef1f4" stroke-width="0.5"/>
+              <!-- alignment ridge at 12 o'clock -->
+              <rect x="97.2" y="4.5" width="5.6" height="14" rx="1.4" fill="#d7dce2" stroke="#b4bcc4" stroke-width="0.4"/>
+              <!-- fill port at ~10 o'clock -->
+              <g transform="rotate(-48 100 100)">
+                <circle cx="100" cy="12" r="6.2" fill="#dfe3e8" stroke="#9aa3ad" stroke-width="0.7"/>
+                <circle cx="100" cy="12" r="3.1" fill="#f8fafc" stroke="#7b8692" stroke-width="0.5"/>
+                <circle cx="100" cy="12" r="1.15" fill="#334155"/>
+              </g>
+              <!-- teal accent at ~8 o'clock, Sequel-ish medical vibe -->
+              <g transform="rotate(148 100 100)">
+                <rect x="96.2" y="3.2" width="7.6" height="15.5" rx="2.4" fill="url(#tealGrad)"/>
+              </g>
+            </svg>
+          </div>
+
+          <div class="udi-label">
+            <div class="udi-matrix">
+              <canvas id="dmCanvas" width="400" height="400" aria-label="GS1 DataMatrix barcode"></canvas>
+            </div>
+            <div class="udi-hri">
+              <p id="hri01">(01) 00850017421431</p>
+              <p id="hri17">(17)</p>
+              <p id="hri21">(21)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="pigtail" aria-hidden="true">
+          <svg class="pigtail-art" viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="tubeGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#e8eef3"/>
+                <stop offset="50%" stop-color="#c5d0d8"/>
+                <stop offset="100%" stop-color="#9eacb6"/>
+              </linearGradient>
+              <linearGradient id="capGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#f4f7fa"/>
+                <stop offset="100%" stop-color="#c9d3db"/>
+              </linearGradient>
+            </defs>
+            <!-- molded luer housing coming off the rim -->
+            <path d="M0 92 C 18 88, 28 84, 42 86 C 52 87, 58 94, 58 100 C 58 106, 52 113, 42 114 C 28 116, 18 112, 0 108 Z" fill="#d8dee4" stroke="#9aa3ad" stroke-width="1"/>
+            <path d="M42 90 h18 a8 8 0 0 1 8 8 v4 a8 8 0 0 1 -8 8 h-18 z" fill="#cfd6dd" stroke="#8b949e" stroke-width="0.8"/>
+            <!-- tubing -->
+            <path d="M66 100 C 110 86, 150 70, 198 92" fill="none" stroke="url(#tubeGrad)" stroke-width="7" stroke-linecap="round"/>
+            <path d="M66 100 C 110 86, 150 70, 198 92" fill="none" stroke="#f8fafc" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
+            <!-- luer cap -->
+            <g transform="translate(198 86) rotate(18)">
+              <rect x="0" y="0" width="36" height="22" rx="3" fill="url(#capGrad)" stroke="#8b949e" stroke-width="0.9"/>
+              <rect x="4" y="-4" width="10" height="30" rx="2" fill="#e8eef3" stroke="#8b949e" stroke-width="0.7"/>
+              <rect x="22" y="3" width="10" height="16" rx="1.5" fill="#d5dee5" stroke="#9aa3ad" stroke-width="0.5"/>
+            </g>
+          </svg>
+        </div>
       </div>
     </div>
-  </header>
 
-  <aside class="disclaimer" role="note">
-    <strong>Research only.</strong>
-    This tool is for reverse-engineering and bench testing. Reusing cassettes is
-    <em>not</em> approved or supported by Twiist / Sequel Med Tech. Not medical advice.
-    Do not use generated labels on supplies worn by a person.
-  </aside>
+    <div class="actions">
+      <button type="button" id="regenBtn" class="btn primary">Regenerate</button>
+      <button type="button" id="customizeBtn" class="btn" aria-expanded="false" aria-controls="customize">Customize</button>
+    </div>
 
-  <main class="layout">
-    <section class="stage" aria-label="Cassette preview">
-      <div class="cassette" id="cassette">
-        <!-- Cute vector cassette / cart -->
-        <svg class="cassette-art" viewBox="0 0 360 220" role="img" aria-label="Disposable cassette illustration">
-          <defs>
-            <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#f7f9fc"/>
-              <stop offset="100%" stop-color="#e4ebf4"/>
-            </linearGradient>
-            <linearGradient id="blueEdge" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stop-color="#1e3a8a"/>
-              <stop offset="100%" stop-color="#2563eb"/>
-            </linearGradient>
-            <filter id="softShadow" x="-10%" y="-10%" width="120%" height="130%">
-              <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.18"/>
-            </filter>
-          </defs>
-
-          <!-- Main body -->
-          <rect x="28" y="36" width="304" height="148" rx="22" fill="url(#bodyGrad)" stroke="#94a3b8" stroke-width="2" filter="url(#softShadow)"/>
-
-          <!-- Left twist-lock port -->
-          <circle cx="58" cy="110" r="26" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/>
-          <circle cx="58" cy="110" r="16" fill="#f8fafc" stroke="#475569" stroke-width="1.5"/>
-          <circle cx="58" cy="110" r="7" fill="#1e40af"/>
-          <path d="M58 94 v32 M42 110 h32" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-
-          <!-- Reservoir window -->
-          <rect x="96" y="58" width="72" height="104" rx="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="1.5"/>
-          <rect x="102" y="92" width="60" height="64" rx="6" fill="#93c5fd" opacity="0.55"/>
-          <text x="132" y="80" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="#1e3a8a" font-weight="600">300 U</text>
-
-          <!-- Label sticker area -->
-          <rect x="184" y="52" width="132" height="116" rx="8" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
-          <text x="250" y="68" text-anchor="middle" font-family="system-ui,sans-serif" font-size="8" fill="#64748b" letter-spacing="0.5">UDI · GS1 DataMatrix</text>
-
-          <!-- Blue accent stripe -->
-          <rect x="28" y="168" width="304" height="16" rx="0" fill="url(#blueEdge)" opacity="0.9"/>
-          <rect x="28" y="168" width="304" height="16" rx="8" fill="url(#blueEdge)" clip-path="inset(0 0 0 0 round 0 0 18 18)"/>
-
-          <!-- Tiny brand stub -->
-          <text x="250" y="158" text-anchor="middle" font-family="system-ui,sans-serif" font-size="7" fill="#94a3b8">DKPI-11073-001 · SAMPLE</text>
-        </svg>
-
-        <div class="dm-slot" title="Generated DataMatrix">
-          <canvas id="dmCanvas" width="200" height="200" aria-label="GS1 DataMatrix barcode"></canvas>
-        </div>
-      </div>
-
-      <div class="preview-meta">
-        <div class="field-readout">
-          <span class="label">Element string</span>
-          <code id="elementString">(01)…</code>
-        </div>
-        <div class="field-readout">
-          <span class="label">Raw digits (for encoding)</span>
-          <code id="rawDigits">…</code>
-        </div>
-        <p class="scan-hint">Hold your phone close to the symbol above — high contrast, no text inside the matrix.</p>
-      </div>
-    </section>
-
-    <section class="controls" aria-label="UDI fields">
-      <h2>UDI fields</h2>
-
+    <section id="customize" class="customize" hidden>
       <label class="ctrl">
         <span class="ctrl-label">
           GTIN <span class="ai">(01)</span>
-          <small>Product code · default DKPI-11073-001 unit-of-use</small>
+          <small>Product code · default is the DKPI-11073-001 unit-of-use GTIN</small>
         </span>
         <input id="gtin" type="text" inputmode="numeric" maxlength="14" autocomplete="off" spellcheck="false" />
       </label>
@@ -127,30 +140,32 @@
       <label class="ctrl">
         <span class="ctrl-label">
           Serial <span class="ai">(21)</span>
-          <small>15 chars typical: YYMMDD + 9 digits · edit freely or regenerate</small>
+          <small>15 chars typical: YYMMDD + 9 digits · edit freely or use Regenerate</small>
         </span>
-        <div class="serial-row">
-          <input id="serial" type="text" inputmode="numeric" maxlength="20" autocomplete="off" spellcheck="false" />
-          <button type="button" id="regenBtn" class="btn primary">Regenerate</button>
-        </div>
+        <input id="serial" type="text" inputmode="numeric" maxlength="20" autocomplete="off" spellcheck="false" />
       </label>
 
-      <div class="actions">
+      <div class="customize-actions">
         <button type="button" id="syncExpiryBtn" class="btn">Expiry = mfg + 1y</button>
         <button type="button" id="resetBtn" class="btn ghost">Reset to defaults</button>
       </div>
 
-      <p id="status" class="status" aria-live="polite"></p>
+      <div class="field-readout">
+        <span class="label">Element string</span>
+        <code id="elementString">(01)…</code>
+      </div>
     </section>
+
+    <p id="status" class="status" aria-live="polite"></p>
   </main>
 
   <footer>
-    <p>
-      CassetteSpoof · open source for RE ·
-      <a href="https://github.com/applehat/CassetteSpoof">github.com/applehat/CassetteSpoof</a>
-    </p>
+    <p class="disclaimer">Research only. Reusing cassettes is not approved or supported by Twiist.</p>
+    <p class="repo"><a href="https://github.com/applehat/CassetteSpoof">github.com/applehat/CassetteSpoof</a></p>
   </footer>
 
   <script src="app.js"></script>
+
+
 </body>
 </html>

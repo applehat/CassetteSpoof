@@ -22,14 +22,15 @@ Real decode from a physical cassette (example):
 - `(17) 270610` → 2027-06-10
 - `(21) 260610970000295`
 
+Encoding is concatenated GS1 (`01008500174214311727061021260610970000295` for that sample) via [bwip-js](https://github.com/metafloor/bwip-js) `gs1datamatrix`.
+
 ## How to use
 
 1. Open the [Pages site](https://applehat.github.io/CassetteSpoof/) (or `index.html` locally).
-2. Confirm / edit GTIN, manufacture date, expiry, and serial.
-3. **Regenerate** makes a new serial with the manufacture-date prefix.
-4. Hold a phone close to the on-cassette DataMatrix preview to scan.
-
-Encoding uses [bwip-js](https://github.com/metafloor/bwip-js) `gs1datamatrix` (proper GS1 / FNC1 mode) from a CDN — no build step.
+2. The first screen is just the cassette, a large DataMatrix, **Regenerate**, and **Customize**.
+3. Hold a second phone up to the on-cassette symbol. The matrix is sized to stay scannable (~280–360 CSS px).
+4. **Regenerate** mints a new serial (and refreshes manufacture/expiry to a valid 1-year gap if the current dates are stale). It does not open Customize.
+5. **Customize** expands GTIN, dates, serial, and guidelines.
 
 ## Local
 

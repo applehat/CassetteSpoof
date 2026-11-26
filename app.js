@@ -7,12 +7,16 @@
   const expEl = document.getElementById("expiryDate");
   const serialEl = document.getElementById("serial");
   const regenBtn = document.getElementById("regenBtn");
+  const customizeBtn = document.getElementById("customizeBtn");
+  const customizeEl = document.getElementById("customize");
   const syncExpiryBtn = document.getElementById("syncExpiryBtn");
   const resetBtn = document.getElementById("resetBtn");
   const elementStringEl = document.getElementById("elementString");
-  const rawDigitsEl = document.getElementById("rawDigits");
   const statusEl = document.getElementById("status");
   const canvas = document.getElementById("dmCanvas");
+  const hri01 = document.getElementById("hri01");
+  const hri17 = document.getElementById("hri17");
+  const hri21 = document.getElementById("hri21");
 
   function pad2(n) {
     return String(n).padStart(2, "0");
@@ -41,6 +45,12 @@
     return out;
   }
 
+  function startOfToday() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  }
+
   function randomDigits(n) {
     const arr = new Uint32Array(n);
     crypto.getRandomValues(arr);
@@ -58,13 +68,20 @@
   }
 
   function makeSerial(mfgDate) {
-    const prefix = toYYMMDD(mfgDate);
-    return prefix + randomDigits(SERIAL_RANDOM_LEN);
+    return toYYMMDD(mfgDate) + randomDigits(SERIAL_RANDOM_LEN);
   }
 
   function setStatus(msg, kind) {
     statusEl.textContent = msg || "";
     statusEl.className = "status" + (kind ? " " + kind : "");
+  }
+
+  function datesFollowGuidelines(mfg, exp) {
+    if (!mfg || !exp) return false;
+    const today = startOfToday();
+    if (mfg > today) return false;
+    if (exp < today) return false;
+    return true;
   }
 
   function validate() {
@@ -80,37 +97,37 @@
     if (!/^[0-9A-Za-z]{1,20}$/.test(serial)) issues.push("Serial must be 1–20 alphanumerics");
 
     if (mfg && exp) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (mfg > today) issues.push("Guideline: manufacture is usually in the past");
-      if (exp < today) issues.push("Guideline: expiry is usually in the future");
+      if (mfg > startOfToday()) issues.push("Guideline: manufacture is usually in the past");
+      if (exp < startOfToday()) issues.push("Guideline: expiry is usually in the future");
     }
 
-    return { gtin, serial, mfg, exp, issues, ok: issues.filter((i) => !i.startsWith("Guideline")).length === 0 };
+    return {
+      gtin,
+      serial,
+      mfg,
+      exp,
+      issues,
+      ok: issues.filter((i) => !i.startsWith("Guideline")).length === 0,
+    };
   }
 
   function elementString(gtin, exp, serial) {
     return `(01)${gtin}(17)${toYYMMDD(exp)}(21)${serial}`;
   }
 
-  function rawDigits(gtin, exp, serial) {
-    // Concatenated AI values as often shown / encoded without parentheses
-    return `01${gtin}17${toYYMMDD(exp)}21${serial}`;
-  }
-
   function render() {
     const v = validate();
     if (!v.ok || !v.mfg || !v.exp) {
-      elementStringEl.textContent = "—";
-      rawDigitsEl.textContent = "—";
+      if (elementStringEl) elementStringEl.textContent = "—";
       setStatus(v.issues.join(" · "), "err");
       return;
     }
 
     const es = elementString(v.gtin, v.exp, v.serial);
-    const raw = rawDigits(v.gtin, v.exp, v.serial);
-    elementStringEl.textContent = es;
-    rawDigitsEl.textContent = raw;
+    if (elementStringEl) elementStringEl.textContent = es;
+    hri01.textContent = `(01) ${v.gtin}`;
+    hri17.textContent = `(17) ${toYYMMDD(v.exp)}`;
+    hri21.textContent = `(21) ${v.serial}`;
 
     try {
       if (typeof bwipjs === "undefined") {
@@ -121,17 +138,21 @@
       bwipjs.toCanvas(canvas, {
         bcid: "gs1datamatrix",
         text: es,
-        scale: 6,
+        scale: 8,
         padding: 4,
         backgroundcolor: "FFFFFF",
         barcolor: "000000",
         includetext: false,
       });
       const guide = v.issues.filter((i) => i.startsWith("Guideline"));
-      setStatus(
-        guide.length ? guide.join(" · ") : "GS1 DataMatrix ready to scan",
-        guide.length ? "" : "ok"
-      );
+      // Keep the default view quiet; only surface problems or customize-panel notes.
+      if (guide.length) {
+        setStatus(guide.join(" · "), "");
+      } else if (!customizeEl.hidden) {
+        setStatus("GS1 DataMatrix ready to scan", "ok");
+      } else {
+        setStatus("", "");
+      }
     } catch (e) {
       setStatus("Encode error: " + (e && e.message ? e.message : e), "err");
     }
@@ -152,10 +173,7 @@
       render();
       return;
     }
-    // Keep the official-ish gap unless the user already moved expiry independently
-    // — sync expiry when mfg changes if expiry still tracks (+1y of previous) OR on first edit we always sync.
     expEl.value = toYMD(addYears(mfg, 1));
-    // Refresh serial prefix to match new mfg while keeping random tail if length matches
     const cur = serialEl.value.trim();
     if (/^\d{6}\d{9}$/.test(cur)) {
       serialEl.value = toYYMMDD(mfg) + cur.slice(6);
@@ -165,11 +183,31 @@
     render();
   }
 
-  regenBtn.addEventListener("click", () => {
-    const mfg = parseYMD(mfgEl.value) || defaultDates().mfg;
+  function regenerate() {
+    let mfg = parseYMD(mfgEl.value);
+    let exp = parseYMD(expEl.value);
+    if (!datesFollowGuidelines(mfg, exp)) {
+      const fresh = defaultDates();
+      mfg = fresh.mfg;
+      exp = fresh.exp;
+      mfgEl.value = toYMD(mfg);
+      expEl.value = toYMD(exp);
+    }
     serialEl.value = makeSerial(mfg);
     render();
-  });
+  }
+
+  function toggleCustomize() {
+    const open = customizeEl.hidden;
+    customizeEl.hidden = !open;
+    customizeBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    customizeBtn.textContent = open ? "Done" : "Customize";
+    if (open) render();
+    else setStatus("", "");
+  }
+
+  regenBtn.addEventListener("click", regenerate);
+  customizeBtn.addEventListener("click", toggleCustomize);
 
   syncExpiryBtn.addEventListener("click", () => {
     const mfg = parseYMD(mfgEl.value);
