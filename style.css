@@ -303,10 +303,12 @@ footer {
 
 .disclaimer {
   margin: 0;
-  font-size: 0.78rem;
-  line-height: 1.4;
-  max-width: 36rem;
+  max-width: 40rem;
   margin-inline: auto;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--muted);
 }
 
 .repo {

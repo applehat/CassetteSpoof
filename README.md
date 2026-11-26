@@ -6,7 +6,7 @@ Static web app that generates **GS1 DataMatrix** symbols matching Twiist disposa
 
 ## Disclaimer
 
-**Research only.** Reusing cassettes is **not** approved or supported by Twiist / Sequel Med Tech. This is not medical advice. Do not put a generated label on a cassette worn by a person. Generated symbols are for scanner / app / protocol testing on the bench.
+CassetteSpoof is a small hobby project for generating GS1 DataMatrix labels. It isn't affiliated with Sequel, it isn't FDA approved, and putting a regenerated code on a cassette you've already used is off-label and unsupported by the manufacturer. Insulin delivery is life-critical, so please make your own informed decision and talk with your care team. We believe individual patient choice matters, but you alone are responsible for how you use this tool, and the author is not liable for any harm, loss, or damage that comes from using it.
 
 ## What it encodes
 
