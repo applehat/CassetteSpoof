@@ -140,7 +140,7 @@
         text: es,
         scale: 8,
         padding: 4,
-        backgroundcolor: "FFFFFF",
+        backgroundcolor: "00000000",  // fully transparent so code sits on cassette face
         barcolor: "000000",
         includetext: false,
       });
